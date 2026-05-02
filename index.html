@@ -1,19 +1,22 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VIP会员专享 - 购物即可抽奖</title>
-    <!-- 引入 p5.js 库 -->
+    <title>Exclusivo VIP · Sorteio ao comprar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- p5.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-    <!-- 新增：引入 canvas-confetti 撒花库 -->
+    <!-- canvas-confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'PingFang SC', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
         }
 
         body {
@@ -42,83 +45,233 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            background-image: repeating-radial-gradient(circle at 50% 150px, transparent, transparent 10px, rgba(255,255,255,0.05) 11px, rgba(255,255,255,0.05) 20px);
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(255, 230, 80, 0.12) 0%, transparent 55%),
+                repeating-radial-gradient(circle at 50% 150px, transparent, transparent 10px, rgba(255,255,255,0.04) 11px, rgba(255,255,255,0.04) 20px);
             z-index: -1;
         }
 
-        /* 头部区域 */
+        /* ===== Header (PT layout) ===== */
+        @keyframes shimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        @keyframes float-coin {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.85; }
+            50%       { transform: translateY(-10px) rotate(8deg); opacity: 1; }
+        }
+        @keyframes badge-glow {
+            0%, 100% { box-shadow: 0 0 12px rgba(255, 200, 50, 0.6), 0 4px 20px rgba(180, 80, 0, 0.5), inset 0 1px 2px rgba(255,255,255,0.8); }
+            50%       { box-shadow: 0 0 24px rgba(255, 210, 80, 0.9), 0 6px 28px rgba(180, 80, 0, 0.6), inset 0 1px 2px rgba(255,255,255,0.8); }
+        }
+        @keyframes title-appear {
+            0%   { opacity: 0; transform: translateY(18px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes sparkle-spin {
+            0%   { transform: rotate(0deg) scale(1); }
+            50%  { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
         .header {
             position: relative;
             z-index: 2;
             text-align: center;
-            padding-top: 30px;
-            margin-bottom: 10px;
+            padding: 32px 14px 14px;
+            margin-bottom: 8px;
+            overflow: visible;
         }
 
+        /* Halo do cabeçalho */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -20px; left: 50%;
+            transform: translateX(-50%);
+            width: 340px; height: 200px;
+            background: radial-gradient(ellipse at 50% 30%, rgba(255, 230, 100, 0.18) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Moedas decorativas */
+        .header-coins {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .header-coin {
+            position: absolute;
+            font-size: 22px;
+            animation: float-coin 3s ease-in-out infinite;
+            filter: drop-shadow(0 2px 4px rgba(180, 80, 0, 0.4));
+        }
+        .header-coin:nth-child(1) { top: 10px; left: 8%;  animation-delay: 0s;    font-size: 20px; }
+        .header-coin:nth-child(2) { top: 25px; right: 10%; animation-delay: 0.7s; font-size: 26px; }
+        .header-coin:nth-child(3) { top: 55px; left: 3%;  animation-delay: 1.4s; font-size: 16px; }
+        .header-coin:nth-child(4) { top: 60px; right: 4%; animation-delay: 2s;   font-size: 18px; }
+
+        /* Badge VIP */
         .vip-badge {
-            display: inline-block;
-            background: linear-gradient(90deg, #fff3c9, #ffe38f);
-            color: #d16b00;
-            font-weight: bold;
-            font-size: 14px;
-            padding: 4px 20px;
-            border-radius: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #fff5d0 0%, #ffd04a 30%, #ffb800 55%, #ffe07a 75%, #ffd04a 100%);
+            color: #7a3800;
+            font-weight: 900;
+            font-size: 12px;
+            padding: 6px 18px 6px 14px;
+            border-radius: 30px;
+            margin-bottom: 12px;
+            letter-spacing: 0.06em;
+            max-width: calc(100% - 24px);
+            text-align: center;
+            line-height: 1.25;
+            animation: badge-glow 2.5s ease-in-out infinite;
+            border: 1px solid rgba(255, 200, 80, 0.9);
+        }
+        .vip-badge .crown-icon {
+            display: inline-flex;
+            align-items: center;
+            filter: drop-shadow(0 1px 2px rgba(120, 50, 0, 0.4));
+        }
+        .vip-badge .badge-text {
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
         }
 
+        /* Subtítulo */
         .subtitle {
-            color: #fff;
-            font-size: 16px;
+            position: relative;
+            z-index: 2;
+            color: rgba(255, 245, 210, 0.92);
+            font-size: 14px;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 5px;
-            letter-spacing: 2px;
-        }
-
-        .subtitle::before, .subtitle::after {
-            content: "";
-            display: inline-block;
-            width: 40px;
-            height: 1px;
-            background-color: #fff;
-            margin: 0 10px;
-        }
-
-        .main-title {
-            color: #fff;
-            font-size: 38px;
-            font-weight: 900;
-            text-shadow: 0 3px 0 #d93d00, 0 4px 5px rgba(0,0,0,0.3);
-            letter-spacing: 2px;
+            flex-wrap: wrap;
             margin-bottom: 10px;
+            letter-spacing: 0.04em;
+            gap: 8px;
+            padding: 0 10px;
+            line-height: 1.35;
         }
-
-        /* 积分余额展示 */
-        .points-display {
+        .subtitle-line {
+            display: inline-block;
+            width: 28px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 230, 150, 0.8));
+        }
+        .subtitle-line.right {
+            background: linear-gradient(270deg, transparent, rgba(255, 230, 150, 0.8));
+        }
+        .subtitle-diamond {
             display: inline-flex;
             align-items: center;
-            background: rgba(0, 0, 0, 0.2);
-            color: #fff;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: sparkle-spin 4s linear infinite;
+        }
+
+        /* Título principal */
+        .main-title {
+            position: relative;
+            z-index: 2;
+            font-family: 'Playfair Display', 'Source Sans 3', Georgia, serif;
+            font-size: clamp(22px, 5.8vw, 32px);
+            font-weight: 900;
+            letter-spacing: 0.02em;
+            margin-bottom: 12px;
+            line-height: 1.22;
+            padding: 0 12px;
+            max-width: 100%;
+            background: linear-gradient(
+                180deg,
+                #ffffff 0%,
+                #fff9e0 20%,
+                #ffe566 45%,
+                #ffcc00 60%,
+                #ff9800 80%,
+                #e65c00 100%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 4px 8px rgba(150, 50, 0, 0.5));
+            animation: title-appear 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        /* Brilho no título */
+        .main-title::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0;
+            background: linear-gradient(
+                105deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.55) 50%,
+                transparent 70%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+            pointer-events: none;
+        }
+        .title-underline {
+            position: relative;
+            z-index: 2;
+            display: block;
+            width: min(72%, 220px);
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd04a, #ffb800, #ffd04a, transparent);
+            margin: -10px auto 16px;
+            border-radius: 2px;
+            opacity: 0.8;
+        }
+
+        /* Pontos */
+        .points-display {
+            position: relative;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px;
+            max-width: 100%;
+            background: rgba(0, 0, 0, 0.22);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: rgba(255, 245, 220, 0.9);
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 210, 100, 0.35);
+            letter-spacing: 0.5px;
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             transform-origin: center;
         }
-
+        .points-display .points-icon {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 3px;
+            vertical-align: middle;
+        }
         .points-display span {
-            color: #ffda46;
-            font-size: 18px;
-            font-weight: bold;
-            margin: 0 4px;
+            color: #ffe04a;
+            font-size: 17px;
+            font-weight: 900;
+            margin: 0 3px;
+            font-family: 'Playfair Display', 'Source Sans 3', Georgia, serif;
             transition: color 0.3s ease;
         }
 
-        /* ======= 抽奖机区域 ======= */
+        /* Máquina de sorteio */
         .lottery-machine {
             position: relative;
             z-index: 3;
@@ -152,20 +305,34 @@
             min-height: 0;
         }
 
+        /* Grade */
         .lottery-grid {
             flex: 1;
             min-height: 0;
             width: 100%;
             height: 100%;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(10, 1fr);
             grid-template-rows: repeat(3, 1fr);
             gap: clamp(4px, 1.15vw, 7px);
             padding: clamp(3px, 0.9vw, 7px);
             background: transparent;
         }
 
-        /* ----- 优化：抽奖卡片基础样式 ----- */
+        /* Larguras das células */
+        .grid-item:nth-child(1) { grid-column: span 4; }
+        .grid-item:nth-child(2) { grid-column: span 3; }
+        .grid-item:nth-child(3) { grid-column: span 3; }
+
+        .grid-item:nth-child(4) { grid-column: span 3; }
+        .grid-item:nth-child(5) { grid-column: span 4; }
+        .grid-item:nth-child(6) { grid-column: span 3; }
+
+        .grid-item:nth-child(7) { grid-column: span 3; }
+        .grid-item:nth-child(8) { grid-column: span 3; }
+        .grid-item:nth-child(9) { grid-column: span 4; }
+
+        /* Células */
         .grid-item {
             background: linear-gradient(180deg, #fffefb 0%, #f2f0ec 100%);
             border-radius: clamp(12px, 3vw, 18px);
@@ -175,7 +342,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: clamp(11px, 2.8vw, 13px);
+            font-size: clamp(8.5px, 2.15vw, 11.5px);
             color: #5c2b00;
             font-weight: 800;
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
@@ -184,6 +351,12 @@
             overflow: hidden;
             border: 1px solid rgba(0, 0, 0, 0.04);
             transition: all 0.15s ease;
+            text-align: center;
+            line-height: 1.18;
+            padding: 2px 3px;
+            hyphens: auto;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .grid-item.active {
@@ -202,7 +375,7 @@
             z-index: 5;
         }
 
-        /* SVG 图标样式 */
+        /* Ícones SVG */
         .grid-item .icon {
             width: clamp(26px, 6vw, 32px);
             height: clamp(26px, 6vw, 32px);
@@ -217,7 +390,7 @@
             height: 100%;
         }
 
-        /* 优化：黄色卡片样式调整以契合新文字 */
+        /* Tarja amarela */
         .grid-item.yellow-bg {
             background: linear-gradient(180deg, #fff4b3, #ffdc46);
             box-shadow: 0 3px 0 #d19a00, inset 0 2px 0 rgba(255, 255, 255, 0.7);
@@ -238,22 +411,24 @@
             filter: brightness(0.9);
         }
 
-        /* 优化：中心抽奖按钮文字 */
+        /* Botão central */
         .center-btn-text {
-            font-size: 19px;
+            font-size: clamp(13px, 3.9vw, 17px);
             font-weight: 900;
             color: #fff;
-            letter-spacing: 1px;
+            letter-spacing: 0.02em;
             text-shadow: 0 2px 3px rgba(184, 90, 0, 0.6);
+            line-height: 1.1;
         }
         
         .center-btn-sub {
-            font-size: 10px;
-            font-weight: normal;
+            font-size: clamp(8px, 2.1vw, 10px);
+            font-weight: 600;
             margin-top: 2px;
             background: rgba(0,0,0,0.15);
-            padding: 2px 6px;
+            padding: 2px 5px;
             border-radius: 10px;
+            line-height: 1.15;
         }
 
         .tag {
@@ -262,31 +437,32 @@
             right: 0;
             background-color: #f53131;
             color: white;
-            font-size: 10px;
-            padding: 2px 5px;
+            font-size: clamp(7px, 1.75vw, 9px);
+            padding: 2px 4px;
             border-bottom-left-radius: 6px;
+            letter-spacing: 0.03em;
         }
 
-        /* ----- 抽奖机下方的操作按钮栏 ----- */
+        /* Linha de ações */
         .action-buttons-row {
             position: relative;
             z-index: 3;
             display: flex;
             justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 20px;
-            padding: 0 20px;
+            align-items: stretch;
+            gap: 10px;
+            margin-top: 18px;
+            padding: 0 14px;
         }
 
         .action-btn {
             flex: 1;
             background: rgba(255, 255, 255, 0.95);
             color: #d71607;
-            padding: 10px 0;
+            padding: 10px 8px;
             border-radius: 25px;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 13px;
+            font-weight: 800;
             box-shadow: 0 4px 10px rgba(220, 40, 0, 0.2);
             cursor: pointer;
             display: flex;
@@ -294,7 +470,10 @@
             justify-content: center;
             border: 2px solid #ffe3df;
             transition: all 0.2s;
-            white-space: nowrap;
+            white-space: normal;
+            text-align: center;
+            line-height: 1.25;
+            min-height: 46px;
         }
 
         .action-btn:active {
@@ -307,7 +486,7 @@
             margin-right: 6px;
         }
 
-        /* 按钮加载状态样式 */
+        /* Loading */
         .action-btn.loading {
             opacity: 0.8;
             cursor: not-allowed;
@@ -322,15 +501,13 @@
             animation: spin 1s linear infinite;
         }
 
-        /* ================================== */
-        /* ----- 优化：信息区块通用及卡片样式 ----- */
         .info-section {
             position: relative;
             z-index: 3;
-            margin: 50px 20px 20px;
+            margin: 46px 16px 20px;
             background: linear-gradient(180deg, #ffffff 0%, #fffaf5 100%);
             border-radius: 16px;
-            padding: 35px 20px 25px;
+            padding: 38px 16px 22px;
             box-shadow: 0 8px 20px rgba(215, 22, 7, 0.08), inset 0 2px 0 rgba(255, 255, 255, 1);
             border: 1px solid rgba(255, 140, 28, 0.25);
         }
@@ -342,29 +519,33 @@
             transform: translateX(-50%);
             background: linear-gradient(90deg, #ffc933, #ffaa00);
             color: #fff;
-            font-size: 17px;
+            font-size: clamp(13px, 3.8vw, 15px);
             font-weight: 900;
-            letter-spacing: 2px;
-            padding: 8px 28px;
+            letter-spacing: 0.04em;
+            padding: 8px 16px;
             border-radius: 30px;
             box-shadow: 0 4px 10px rgba(255, 170, 0, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.4);
             border: none;
-            white-space: nowrap;
+            white-space: normal;
+            max-width: min(94%, 360px);
+            text-align: center;
+            line-height: 1.25;
         }
 
-        /* ----- 优化：“活动详情”列表排版 ----- */
+        /* Lista de benefícios */
         .details-list {
             text-align: center;
             color: #5c2b00;
-            font-size: 15px;
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.35;
         }
 
         .details-list div {
             background: rgba(255, 140, 28, 0.06);
             margin-bottom: 8px;
             border-radius: 8px;
-            padding: 8px 0;
+            padding: 9px 8px;
         }
 
         .details-list div:last-child {
@@ -378,7 +559,7 @@
             font-weight: 900;
         }
 
-        /* ----- 优化：“活动细则”排版 ----- */
+        /* Regras */
         .rules-title {
             color: #d71607;
             font-weight: 900;
@@ -409,9 +590,9 @@
             border: 1px dashed #ffd6b3;
         }
 
-        /* ----- 优化：“中奖公告”列表排版 ----- */
+        /* Avisos rolantes */
         .announcement-wrapper {
-            height: 110px;
+            height: 138px;
             overflow: hidden;
             position: relative;
         }
@@ -432,19 +613,21 @@
 
         .announcement-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             background: #fff;
             margin-bottom: 10px;
-            padding: 10px 15px;
+            padding: 10px 12px;
             border-radius: 10px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.03);
             border: 1px solid #fcf0e3;
             color: #5c2b00;
-            font-size: 13px;
-            font-weight: bold;
+            font-size: 11.5px;
+            font-weight: 700;
+            line-height: 1.4;
+            flex-wrap: wrap;
         }
 
-        /* ======= 精美弹窗通用样式 ======= */
+        /* Pop-ups */
         .popup-overlay {
             position: fixed;
             top: 0;
@@ -469,8 +652,8 @@
 
         .popup-content {
             background: linear-gradient(180deg, #fffefb 0%, #fff1eb 100%);
-            width: 80%;
-            max-width: 320px;
+            width: 88%;
+            max-width: 350px;
             border-radius: 20px;
             padding: 30px 20px;
             text-align: center;
@@ -490,7 +673,7 @@
             opacity: 1;
         }
 
-        /* 背后旋转的光芒 */
+        /* Luz rotativa */
         .popup-light {
             position: absolute;
             top: -50%;
@@ -515,11 +698,13 @@
 
         .popup-header {
             color: #d71607;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 900;
             margin-bottom: 10px;
             text-shadow: 0 1px 2px rgba(215,22,7,0.2);
-            letter-spacing: 2px;
+            letter-spacing: 0.03em;
+            line-height: 1.25;
+            padding: 0 8px;
         }
 
         .popup-icon {
@@ -541,17 +726,21 @@
         }
 
         .popup-text {
-            font-size: 16px;
+            font-size: 15px;
             color: #555;
             margin-bottom: 25px;
-            font-weight: bold;
+            font-weight: 700;
+            line-height: 1.45;
+            padding: 0 6px;
         }
 
         .popup-text .highlight {
             color: #ff3b30;
-            font-size: 24px;
+            font-size: clamp(18px, 5vw, 22px);
             display: block;
             margin-top: 8px;
+            line-height: 1.2;
+            word-break: break-word;
         }
 
         .popup-btn {
@@ -581,7 +770,7 @@
             cursor: pointer;
         }
 
-        /* ----- 我的奖品列表相关样式 ----- */
+        /* Lista de prêmios */
         .prizes-list-container {
             max-height: 250px;
             overflow-y: auto;
@@ -590,7 +779,7 @@
             padding-right: 5px;
         }
 
-        /* 滚动条美化 */
+        /* Scrollbar */
         .prizes-list-container::-webkit-scrollbar {
             width: 4px;
         }
@@ -601,17 +790,6 @@
         .prizes-list-container::-webkit-scrollbar-thumb {
             background: #ffb880; 
             border-radius: 4px;
-        }
-
-        .prize-history-item {
-            display: flex;
-            align-items: center;
-            background: #fff;
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 6px rgba(215, 22, 7, 0.08);
-            border: 1px solid #ffe3df;
         }
 
         .prize-history-icon {
@@ -625,23 +803,39 @@
         .prize-history-icon svg { width: 100%; height: 100%; }
 
         .prize-history-info { flex: 1; }
-        .prize-history-name { font-size: 15px; font-weight: bold; color: #d71607; margin-bottom: 4px; }
+        .prize-history-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #d71607;
+            margin-bottom: 4px;
+            line-height: 1.3;
+            word-break: break-word;
+        }
         .prize-history-time { font-size: 12px; color: #999; }
 
-        /* ----- 新增：兑奖按钮样式 ----- */
         .prize-history-item {
-            justify-content: space-between; /* 让内容和按钮两端对齐 */
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            background: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 6px rgba(215, 22, 7, 0.08);
+            border: 1px solid #ffe3df;
         }
 
         .prize-history-info {
-            margin-right: 10px; /* 给右侧按钮留点间距 */
+            margin-right: 10px;
         }
 
         .redeem-btn {
             background: linear-gradient(90deg, #ff8c1c, #ff5200);
             color: #fff;
-            font-size: 12px;
-            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 7px 10px;
             border-radius: 15px;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(255, 82, 0, 0.3);
@@ -649,7 +843,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 60px;
+            min-width: 74px;
+            flex-shrink: 0;
+            text-align: center;
+            line-height: 1.15;
+            letter-spacing: 0.02em;
         }
 
         .redeem-btn:active {
@@ -670,6 +868,87 @@
             cursor: default;
             border: 1px solid #eee;
         }
+
+        /* Toast de rodada extra */
+        @keyframes toast-in {
+            0%   { top: -80px; opacity: 0; }
+            100% { top: 18px;  opacity: 1; }
+        }
+        @keyframes toast-out {
+            0%   { top: 18px;  opacity: 1; }
+            100% { top: -80px; opacity: 0; }
+        }
+        .toast-notification {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            top: -80px;
+            background: linear-gradient(135deg, #ff9b00, #ff5200);
+            color: #fff;
+            padding: 11px 22px 11px 14px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 800;
+            z-index: 100000;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.32);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            opacity: 0;
+            white-space: nowrap;
+        }
+        .toast-notification.show {
+            animation: toast-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .toast-notification.hide {
+            animation: toast-out 0.35s ease-in forwards;
+        }
+        .toast-notification svg {
+            width: 20px; height: 20px; flex-shrink: 0;
+        }
+
+        /* Countdown de validade */
+        .deadline-strip {
+            position: relative;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,0,0,0.18);
+            border: 1px solid rgba(255,200,80,0.3);
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255, 240, 200, 0.92);
+            letter-spacing: 0.02em;
+            margin-top: 8px;
+        }
+        .deadline-strip .deadline-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #4cff88;
+            box-shadow: 0 0 5px #4cff88;
+            animation: pulse-dot 1.5s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.5; transform: scale(0.7); }
+        }
+        .deadline-strip .countdown-nums {
+            color: #ffe04a;
+            font-weight: 900;
+        }
+
+        /* Announcements timestamp */
+        .ann-time {
+            font-weight: 500;
+            color: #b07040;
+            font-size: 10.5px;
+            margin-left: 3px;
+        }
     </style>
 </head>
 <body>
@@ -678,366 +957,439 @@
     <div class="bg-decoration"></div>
 
     <div class="header">
-        <div class="vip-badge">VIP会员专享</div>
-        <div class="subtitle">购物即可抽奖</div>
-        <div class="main-title">抽取现金红包机会</div>
-        
-        <!-- 积分显示区域 -->
+        <div class="header-coins">
+            <span class="header-coin">
+                <svg viewBox="0 0 32 32" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="14" fill="url(#coin-grad1)" stroke="#c97a00" stroke-width="1.5"/>
+                    <circle cx="16" cy="16" r="10" fill="none" stroke="rgba(255,220,80,0.5)" stroke-width="1"/>
+                    <text x="16" y="20.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#7a3800" font-family="'Source Sans 3',sans-serif">R$</text>
+                    <defs><radialGradient id="coin-grad1" cx="38%" cy="32%" r="65%"><stop offset="0%" stop-color="#fff5c0"/><stop offset="50%" stop-color="#ffc820"/><stop offset="100%" stop-color="#e07800"/></radialGradient></defs>
+                </svg>
+            </span>
+            <span class="header-coin">
+                <svg viewBox="0 0 32 32" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="14" fill="url(#coin-grad2)" stroke="#c97a00" stroke-width="1.5"/>
+                    <circle cx="16" cy="16" r="10" fill="none" stroke="rgba(255,220,80,0.5)" stroke-width="1"/>
+                    <text x="16" y="20.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#7a3800" font-family="'Source Sans 3',sans-serif">R$</text>
+                    <defs><radialGradient id="coin-grad2" cx="38%" cy="32%" r="65%"><stop offset="0%" stop-color="#fff5c0"/><stop offset="50%" stop-color="#ffc820"/><stop offset="100%" stop-color="#e07800"/></radialGradient></defs>
+                </svg>
+            </span>
+            <span class="header-coin">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2 L13.5 10.5 L22 12 L13.5 13.5 L12 22 L10.5 13.5 L2 12 L10.5 10.5 Z" fill="url(#star-grad)" stroke="rgba(255,200,50,0.6)" stroke-width="0.5"/>
+                    <defs><radialGradient id="star-grad" cx="40%" cy="30%" r="70%"><stop offset="0%" stop-color="#fffde0"/><stop offset="100%" stop-color="#ffcc00"/></radialGradient></defs>
+                </svg>
+            </span>
+            <span class="header-coin">
+                <svg viewBox="0 0 32 32" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="14" fill="url(#coin-grad3)" stroke="#c97a00" stroke-width="1.5"/>
+                    <circle cx="16" cy="16" r="10" fill="none" stroke="rgba(255,220,80,0.5)" stroke-width="1"/>
+                    <text x="16" y="20.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#7a3800" font-family="'Source Sans 3',sans-serif">R$</text>
+                    <defs><radialGradient id="coin-grad3" cx="38%" cy="32%" r="65%"><stop offset="0%" stop-color="#fff5c0"/><stop offset="50%" stop-color="#ffc820"/><stop offset="100%" stop-color="#e07800"/></radialGradient></defs>
+                </svg>
+            </span>
+        </div>
+
+        <div class="vip-badge">
+            <span class="crown-icon">
+                <svg viewBox="0 0 20 14" width="16" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 13 L2.5 5 L6.5 9 L10 1 L13.5 9 L17.5 5 L19 13 Z" fill="url(#crown-grad)" stroke="#9a5800" stroke-width="0.8" stroke-linejoin="round"/>
+                    <circle cx="1.8" cy="4.5" r="1.2" fill="#ffdd55"/>
+                    <circle cx="10" cy="1.2" r="1.2" fill="#ffdd55"/>
+                    <circle cx="18.2" cy="4.5" r="1.2" fill="#ffdd55"/>
+                    <defs><linearGradient id="crown-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ffe870"/><stop offset="100%" stop-color="#ffaa00"/></linearGradient></defs>
+                </svg>
+            </span>
+            <span class="badge-text">Exclusivo VIP</span>
+        </div>
+
+        <div class="subtitle">
+            <span class="subtitle-line"></span>
+            <span class="subtitle-diamond">
+                <svg viewBox="0 0 10 10" width="8" height="8"><polygon points="5,0 10,5 5,10 0,5" fill="rgba(255,220,100,0.85)"/></svg>
+            </span>
+            Compre e participe do sorteio
+            <span class="subtitle-diamond">
+                <svg viewBox="0 0 10 10" width="8" height="8"><polygon points="5,0 10,5 5,10 0,5" fill="rgba(255,220,100,0.85)"/></svg>
+            </span>
+            <span class="subtitle-line right"></span>
+        </div>
+
+        <div class="main-title" data-text="Chance de ganhar em dinheiro">Chance de ganhar em dinheiro</div>
+        <span class="title-underline"></span>
+
         <div class="points-display" id="pointsDisplayContainer">
-            我的积分：<span id="pointsDisplayNum">200</span>
+            <span class="points-icon">
+                <svg viewBox="0 0 16 14" width="14" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 1 H13 L16 5 L8 13 L0 5 Z" fill="url(#gem-grad)" stroke="#d4a000" stroke-width="0.6" stroke-linejoin="round"/>
+                    <path d="M0 5 H16 M3 1 L5.5 5 M13 1 L10.5 5 M8 13 L5.5 5 M8 13 L10.5 5" stroke="rgba(255,220,80,0.5)" stroke-width="0.5"/>
+                    <defs><linearGradient id="gem-grad" x1="0%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#fff5c0"/><stop offset="50%" stop-color="#ffe040"/><stop offset="100%" stop-color="#ffa000"/></linearGradient></defs>
+                </svg>
+            </span>
+            Meus pontos: <span id="pointsDisplayNum">200</span>&nbsp;pts
+        </div>
+
+        <!-- Countdown de validade -->
+        <div class="deadline-strip">
+            <span class="deadline-dot"></span>
+            Oferta válida até 31/05/2026 &nbsp;·&nbsp;
+            <span class="countdown-nums" id="countdownDisplay">carregando...</span>
         </div>
     </div>
 
     <div class="lottery-machine">
-        <img src="machine-bg_2.png" alt="抽奖机" class="machine-bg-img">
+        <img src="machine-bg_2.png" alt="Máquina de sorteio" class="machine-bg-img">
         
-        <div class="machine-content" aria-label="抽奖九宫格">
+        <div class="machine-content" aria-label="Grade de sorteio">
             <div class="lottery-grid">
                 <div class="grid-item">
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff473a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V6z"></path><path d="M9 10h.01M15 10h.01M9 14h.01M15 14h.01"></path></svg>
                     </div>
-                    <div>50元代金券</div>
+                    <div>Cupom R$50</div>
                 </div>
                 <div class="grid-item yellow-bg">
-                    <div class="tag">热销</div>
+                    <div class="tag">TOP</div>
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff8c1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"></line><circle cx="6.5" cy="6.5" r="2.5"></circle><circle cx="17.5" cy="17.5" r="2.5"></circle></svg>
                     </div>
-                    <div>9折折扣券</div>
+                    <div>Cupom 10% OFF</div>
                 </div>
                 <div class="grid-item">
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#00a8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
                     </div>
-                    <div>再来一次</div>
+                    <div>Rodada extra</div>
                 </div>
                 <div class="grid-item">
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff473a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V6z"></path><path d="M9 10h.01M15 10h.01M9 14h.01M15 14h.01"></path></svg>
                     </div>
-                    <div>100元满减券</div>
+                    <div>Cupom R$100</div>
                 </div>
                 
                 <div class="grid-item center-btn" id="startBtn">
-                    <div class="center-btn-text">点击抽奖</div>
-                    <div class="center-btn-sub">100积分/次</div>
+                    <div class="center-btn-text">Sortear</div>
+                    <div class="center-btn-sub">100 pts / jogada</div>
                 </div>
                 
                 <div class="grid-item">
-                    <div class="tag" style="background: #ff758c;">专享</div>
+                    <div class="tag" style="background: #ff758c;">VIP</div>
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
                     </div>
-                    <div>全场免邮券</div>
+                    <div>Frete grátis</div>
                 </div>
                 <div class="grid-item yellow-bg">
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#a0a0a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
                     </div>
-                    <div>谢谢参与</div>
+                    <div>Obrigado!</div>
                 </div>
                 <div class="grid-item">
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#f5a623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </div>
-                    <div>500购物积分</div>
+                    <div>500 pts na loja</div>
                 </div>
                 <div class="grid-item yellow-bg">
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#f5a623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </div>
-                    <div>888购物积分</div>
+                    <div>888 pts na loja</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 抽奖机下方的操作按钮栏 -->
+    <!-- Botões abaixo da máquina -->
     <div class="action-buttons-row">
-        <!-- 我的奖品 按钮 -->
         <div class="action-btn" id="openMyPrizesBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-            我的奖品
+            Meus prêmios
         </div>
-        <!-- 获取积分 按钮 -->
         <div class="action-btn" id="getMainPointsBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-            获取积分
+            Ganhar pontos
         </div>
     </div>
 
-    <!-- 活动详情 -->
+    <!-- Detalhes -->
     <div class="info-section">
-        <div class="section-title">· 活动详情 ·</div>
+        <div class="section-title">· Detalhes da campanha ·</div>
         <div class="details-list">
-            <div>满<span>500</span>送2次机会</div>
-            <div>满<span>1000</span>送5次机会</div>
-            <div>满<span>2000</span>送10次机会</div>
+            <div>Acima de <span>500</span>: +2 sorteios extras</div>
+            <div>Acima de <span>1000</span>: +5 sorteios extras</div>
+            <div>Acima de <span>2000</span>: +10 sorteios extras</div>
         </div>
     </div>
 
-    <!-- 活动细则及免责声明 -->
+    <!-- Regras e aviso -->
     <div class="info-section" style="padding-top: 25px;">
-        <div class="section-title">· 活动细则 ·</div>
+        <div class="section-title">· Regras e condições ·</div>
         
-        <div class="rules-title">活动规则：</div>
+        <div class="rules-title">Regras da campanha</div>
         <div class="rules-content">
-            1. 每次点击抽奖将消耗 100 积分。<br>
-            2. 抽中的折扣券、代金券等奖品将自动存入“我的奖品”记录中。<br>
-            3. 请在活动有效期内进入“我的奖品”点击兑换使用，逾期作废。<br>
-            4. 积分不足时，可通过完成指定购物任务获取更多积分。
+            1. Cada sorteio consome <strong>100</strong> pontos.<br>
+            2. Cupons e vales ficam disponíveis em <strong>Meus prêmios</strong>.<br>
+            3. Resgate dentro do prazo da promoção em <strong>Meus prêmios</strong>; após o vencimento os prêmios expiram.<br>
+            4. Sem pontos suficientes? Complete as tarefas de compra indicadas para ganhar mais.
         </div>
         
-        <div class="rules-title" style="margin-top: 15px;">免责声明：</div>
+        <div class="rules-title" style="margin-top: 15px;">Isenção de responsabilidade</div>
         <div class="rules-content">
-            1、不能保证最终收益。<br>
-            2、不允许18岁以下的儿童进入。最终的胜利/效果受制于游戏或事件的规则。<br>
-            3、Sorteio de Pontos是一个独立的跨国电子商务平台，专注于销售3C产品和日常用品。本平台保留最终解释权，并拥有独家权利。
+            1. Não há garantia de lucro ou ganho líquido.<br>
+            2. É proibida a participação de menores de 18 anos. O resultado está sujeito às regras do sorteio ou do evento.<br>
+            3. A plataforma <strong>Sorteio de Pontos</strong> é um e‑commerce multinacional focado em eletrônica (3C) e artigos do dia a dia. Reservamo‑nos o direito de interpretação final e todos os direitos exclusivos relacionados à campanha.
         </div>
     </div>
 
-    <!-- 修改后：中奖公告 (加入外层wrapper并复制列表以实现无缝滚动) -->
+    <!-- Avisos de ganhadores -->
     <div class="info-section" style="margin-bottom: 60px;">
-        <div class="section-title">· 中奖公告 ·</div>
+        <div class="section-title">· Painel dos ganhadores ·</div>
         <div class="announcement-wrapper">
-            <div class="announcement-list">
-                <!-- 第一组中奖记录 -->
-                <div class="announcement-item">
-                    <svg viewBox="0 0 24 24" fill="#ff473a" style="width:16px; height:16px; margin-right:6px; flex-shrink:0;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg> 
-                    恭喜 138****9021 获得100元满减券
-                </div>
-                <div class="announcement-item">
-                    <svg viewBox="0 0 24 24" fill="#ff473a" style="width:16px; height:16px; margin-right:6px; flex-shrink:0;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg> 
-                    恭喜 匿名用户 获得500购物积分
-                </div>
-                <div class="announcement-item">
-                    <svg viewBox="0 0 24 24" fill="#ff473a" style="width:16px; height:16px; margin-right:6px; flex-shrink:0;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg> 
-                    恭喜 152****3342 获得9折折扣券
-                </div>
-                <div class="announcement-item">
-                    <svg viewBox="0 0 24 24" fill="#ff473a" style="width:16px; height:16px; margin-right:6px; flex-shrink:0;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg> 
-                    恭喜 188****1290 获得全场免邮券
-                </div>
-                
-                <!-- 第二组中奖记录（完全复制第一组），用于实现无缝衔接 -->
-                <div class="announcement-item">
-                    <svg viewBox="0 0 24 24" fill="#ff473a" style="width:16px; height:16px; margin-right:6px; flex-shrink:0;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg> 
-                    恭喜 138****9021 获得100元满减券
-                </div>
-                <div class="announcement-item">
-                    <svg viewBox="0 0 24 24" fill="#ff473a" style="width:16px; height:16px; margin-right:6px; flex-shrink:0;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg> 
-                    恭喜 匿名用户 获得500购物积分
-                </div>
-                <div class="announcement-item">
-                    <svg viewBox="0 0 24 24" fill="#ff473a" style="width:16px; height:16px; margin-right:6px; flex-shrink:0;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg> 
-                    恭喜 152****3342 获得9折折扣券
-                </div>
-                <div class="announcement-item">
-                    <svg viewBox="0 0 24 24" fill="#ff473a" style="width:16px; height:16px; margin-right:6px; flex-shrink:0;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg> 
-                    恭喜 188****1290 获得全场免邮券
-                </div>
-            </div>
+            <div class="announcement-list" id="announcementList"></div>
         </div>
     </div>
 </div>
 
-<!-- ================= 中奖动画弹窗 ================= -->
+<!-- Toast de rodada extra -->
+<div class="toast-notification" id="toastNotification">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 7 13.5 16.5 8.5 11.5 1 18"/><polyline points="17 7 23 7 23 13"/>
+    </svg>
+    <span id="toastText">Rodada extra! +1 jogada grátis!</span>
+</div>
+
+<!-- Pop-up de vitória -->
 <div class="popup-overlay" id="popupOverlay">
     <div class="popup-content">
         <div class="popup-light"></div>
         <div class="popup-inner">
-            <div class="popup-header">- 恭喜中奖 -</div>
+            <div class="popup-header">• Parabéns •</div>
             <div class="popup-icon" id="popupIcon"></div>
-            <div class="popup-text">您获得了<span id="popupPrizeName" class="highlight">大奖名称</span></div>
-            <div class="popup-btn" id="closePopupBtn">开心收下</div>
+            <div class="popup-text">Você ganhou<br><span id="popupPrizeName" class="highlight">Nome do prêmio</span></div>
+            <div class="popup-btn" id="closePopupBtn">Ótimo!</div>
         </div>
     </div>
 </div>
 
-<!-- ================= 积分不足引导弹窗 ================= -->
+<!-- Pontos insuficientes -->
 <div class="popup-overlay" id="noPointsPopup">
     <div class="popup-content" style="background: #fff; padding-top: 40px;">
         <div class="popup-inner">
-            <div class="popup-header" style="color: #ff8c1c; font-size: 22px;">积分不足</div>
+            <div class="popup-header" style="color: #ff8c1c; font-size: 22px;">Pontos insuficientes</div>
             <div class="popup-text" style="margin: 20px 0; color: #666;">
-                您的积分余额已不足 100 分<br>去完成任务获取更多积分吧！
+                Seu saldo é inferior a <strong>100</strong> pontos.<br>Complete tarefas na loja para ganhar mais.
             </div>
-            <div class="popup-btn" id="getMorePointsBtn">获取积分</div>
-            <div class="popup-link" id="closeNoPointsBtn">暂不需要，稍后再说</div>
+            <div class="popup-btn" id="getMorePointsBtn">Ganhar pontos</div>
+            <div class="popup-link" id="closeNoPointsBtn">Agora não</div>
         </div>
     </div>
 </div>
 
-<!-- ================= 我的奖品列表弹窗 ================= -->
+<!-- Lista de prêmios -->
 <div class="popup-overlay" id="myPrizesPopup">
     <div class="popup-content" style="background: #fff; padding: 25px 20px;">
         <div class="popup-inner" style="display: flex; flex-direction: column; height: 100%;">
-            <div class="popup-header" style="color: #ff5200; font-size: 20px; margin-bottom: 20px; text-shadow: none;">- 我的奖品记录 -</div>
+            <div class="popup-header" style="color: #ff5200; font-size: 20px; margin-bottom: 20px; text-shadow: none;">• Histórico de prêmios •</div>
             <div class="prizes-list-container" id="prizesListContainer"></div>
-            <div class="popup-btn" id="closeMyPrizesBtn" style="margin-top: 10px;">关闭</div>
+            <div class="popup-btn" id="closeMyPrizesBtn" style="margin-top: 10px;">Fechar</div>
         </div>
     </div>
 </div>
 
-<!-- ================= JS 交互逻辑 ================= -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // ======== 新增：撒花配置 ========
-        // 满屏撒花动效
+
+        /* ── Confetti ── */
         function triggerConfetti() {
             const duration = 2500;
             const end = Date.now() + duration;
             (function frame() {
-                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, zIndex: 10000, colors: ['#ff8c1c', '#ff5200', '#ffda46', '#4CAF50'] });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, zIndex: 10000, colors: ['#ff8c1c', '#ff5200', '#ffda46', '#4CAF50'] });
+                confetti({ particleCount: 5, angle: 60,  spread: 55, origin: { x: 0 }, zIndex: 10000, colors: ['#ff8c1c','#ff5200','#ffda46','#4CAF50'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, zIndex: 10000, colors: ['#ff8c1c','#ff5200','#ffda46','#4CAF50'] });
                 if (Date.now() < end) requestAnimationFrame(frame);
             }());
         }
-        // ===============================================
 
-        const gridItems = document.querySelectorAll('.grid-item');
-        const startBtn = document.getElementById('startBtn');
-        
-        // 弹窗相关
-        const popupOverlay = document.getElementById('popupOverlay');
-        const closePopupBtn = document.getElementById('closePopupBtn');
-        const noPointsPopup = document.getElementById('noPointsPopup');
-        const getMorePointsBtn = document.getElementById('getMorePointsBtn'); 
-        const closeNoPointsBtn = document.getElementById('closeNoPointsBtn');
-        
-        // 操作栏与记录列表
-        const myPrizesPopup = document.getElementById('myPrizesPopup');
-        const openMyPrizesBtn = document.getElementById('openMyPrizesBtn');
-        const closeMyPrizesBtn = document.getElementById('closeMyPrizesBtn');
-        const prizesListContainer = document.getElementById('prizesListContainer');
-        const getMainPointsBtn = document.getElementById('getMainPointsBtn'); 
-        
-        // 数据变量
-        let currentPoints = 200; 
-        const costPerDraw = 100; 
+        /* ── Toast ── */
+        let toastTimer = null;
+        function showToast(text) {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastText').textContent = text;
+            toast.classList.remove('hide');
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+            }, 2600);
+        }
+
+        /* ── Countdown ── */
+        function updateCountdown() {
+            const deadline = new Date('2026-05-31T23:59:59');
+            const now = new Date();
+            const diff = deadline - now;
+            const el = document.getElementById('countdownDisplay');
+            if (!el) return;
+            if (diff <= 0) { el.textContent = 'Encerrado'; return; }
+            const days  = Math.floor(diff / 86400000);
+            const hours = Math.floor((diff % 86400000) / 3600000);
+            const mins  = Math.floor((diff % 3600000)  / 60000);
+            el.textContent = `${days}d ${hours}h ${String(mins).padStart(2,'0')}min`;
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 30000);
+
+        /* ── Announcement data (巴西手机格式 + 时间戳) ── */
+        const announcements = [
+            { phone: '(11) 9****-4823', prize: 'Cupom R$100',      time: '00:14' },
+            { phone: '(21) 9****-7391', prize: '500 pts na loja',  time: '00:27' },
+            { phone: '(31) 9****-2047', prize: 'Cupom 10% OFF',    time: '00:43' },
+            { phone: '(41) 9****-8165', prize: 'Frete grátis',     time: '00:58' },
+            { phone: '(51) 9****-3782', prize: 'Cupom R$50',       time: '01:09' },
+            { phone: '(61) 9****-9043', prize: '888 pts na loja',  time: '01:22' },
+            { phone: '(71) 9****-5216', prize: 'Cupom R$100',      time: '01:35' },
+            { phone: '(81) 9****-6894', prize: 'Frete grátis',     time: '01:47' },
+            { phone: '(85) 9****-1237', prize: 'Cupom 10% OFF',    time: '01:59' },
+            { phone: '(27) 9****-4519', prize: '500 pts na loja',  time: '02:13' },
+            { phone: '(11) 9****-8731', prize: 'Cupom R$50',       time: '02:28' },
+            { phone: '(21) 9****-2485', prize: '888 pts na loja',  time: '02:41' },
+        ];
+        const speakerSVG = `<svg viewBox="0 0 24 24" fill="#ff473a" style="width:15px;height:15px;margin-right:6px;flex-shrink:0;margin-top:2px;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>`;
+        function buildAnnouncements() {
+            const list = document.getElementById('announcementList');
+            if (!list) return;
+            // duplicate for seamless loop
+            const all = [...announcements, ...announcements];
+            list.innerHTML = all.map(a =>
+                `<div class="announcement-item">${speakerSVG}Parabéns! <strong style="margin:0 2px;">${a.phone}</strong> ganhou <strong>${a.prize}</strong><span class="ann-time">· ${a.time}</span></div>`
+            ).join('');
+        }
+        buildAnnouncements();
+
+        /* ── DOM refs ── */
+        const gridItems            = document.querySelectorAll('.grid-item');
+        const startBtn             = document.getElementById('startBtn');
+        const popupOverlay         = document.getElementById('popupOverlay');
+        const closePopupBtn        = document.getElementById('closePopupBtn');
+        const noPointsPopup        = document.getElementById('noPointsPopup');
+        const getMorePointsBtn     = document.getElementById('getMorePointsBtn');
+        const closeNoPointsBtn     = document.getElementById('closeNoPointsBtn');
+        const myPrizesPopup        = document.getElementById('myPrizesPopup');
+        const openMyPrizesBtn      = document.getElementById('openMyPrizesBtn');
+        const closeMyPrizesBtn     = document.getElementById('closeMyPrizesBtn');
+        const prizesListContainer  = document.getElementById('prizesListContainer');
+        const getMainPointsBtn     = document.getElementById('getMainPointsBtn');
         const pointsDisplayContainer = document.getElementById('pointsDisplayContainer');
-        const pointsDisplayNum = document.getElementById('pointsDisplayNum');
-        let prizeHistory = []; 
+        const pointsDisplayNum     = document.getElementById('pointsDisplayNum');
+
+        /* ── State ── */
+        let currentPoints = 200;
+        const costPerDraw = 100;
+        let prizeHistory  = [];
+        let freeDraw      = false;   // true when "Rodada extra" was hit
 
         const prizeSequence = [0, 1, 2, 5, 8, 7, 6, 3];
-        let isDrawing = false;
+        let isDrawing  = false;
         let currentStep = -1;
-        let speed = 100;
-        let timer = null;
+        let speed      = 100;
+        let timer      = null;
         let totalSteps = 0;
-        let baseCircles = 4;
+        const baseCircles = 4;
 
-        // 【新增】：抽奖箱下方“获取积分”按钮交互逻辑
+        /* ── 点击弹窗遮罩关闭（三个弹窗） ── */
+        function closePopupByOverlay(overlay, onClose) {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) onClose();
+            });
+        }
+
+        function closeWinPopup() {
+            popupOverlay.classList.remove('show');
+            if (currentStep >= 0) {
+                gridItems[prizeSequence[currentStep % prizeSequence.length]].classList.remove('active');
+                currentStep = -1;
+            }
+        }
+
+        closePopupByOverlay(popupOverlay,  closeWinPopup);
+        closePopupByOverlay(noPointsPopup, () => noPointsPopup.classList.remove('show'));
+        closePopupByOverlay(myPrizesPopup, () => myPrizesPopup.classList.remove('show'));
+
+        closePopupBtn.addEventListener('click', closeWinPopup);
+        closeNoPointsBtn.addEventListener('click', () => noPointsPopup.classList.remove('show'));
+        closeMyPrizesBtn.addEventListener('click', () => myPrizesPopup.classList.remove('show'));
+
+        /* ── 积分按钮 ── */
         getMainPointsBtn.addEventListener('click', () => {
-            // 防止重复点击
             if (getMainPointsBtn.classList.contains('loading')) return;
-            
-            // 改变状态并修改内部文字与图标为 Loading
             getMainPointsBtn.classList.add('loading');
-            getMainPointsBtn.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spinner"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
-                正在加载中...
-            `;
-
-            // 模拟2秒后恢复
+            getMainPointsBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spinner"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg> Carregando...`;
             setTimeout(() => {
                 getMainPointsBtn.classList.remove('loading');
-                getMainPointsBtn.innerHTML = `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                    获取积分
-                `;
+                getMainPointsBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Ganhar pontos`;
             }, 2000);
         });
 
-        // 打开我的奖品
-        openMyPrizesBtn.addEventListener('click', () => {
-            renderPrizeHistory();
-            myPrizesPopup.classList.add('show');
+        getMorePointsBtn.addEventListener('click', () => {
+            window.location.href = "https://www.example.com/get-more-points";
         });
 
-        // 关闭我的奖品
-        closeMyPrizesBtn.addEventListener('click', () => {
-            myPrizesPopup.classList.remove('show');
-        });
+        /* ── Meus Prêmios ── */
+        openMyPrizesBtn.addEventListener('click', () => { renderPrizeHistory(); myPrizesPopup.classList.add('show'); });
 
-        // 渲染奖品列表
         function renderPrizeHistory() {
             if (prizeHistory.length === 0) {
-                prizesListContainer.innerHTML = '<div style="text-align:center; color:#999; padding: 40px 0; font-size: 14px;">暂无中奖记录<br>快去参与抽奖吧！</div>';
+                prizesListContainer.innerHTML = '<div style="text-align:center;color:#999;padding:40px 0;font-size:14px;line-height:1.5;">Ainda não há prêmios.<br>Faça já o seu primeiro sorteio!</div>';
                 return;
             }
-            
             let html = '';
-            for(let i = prizeHistory.length - 1; i >= 0; i--) {
+            for (let i = prizeHistory.length - 1; i >= 0; i--) {
                 const p = prizeHistory[i];
-                html += `
-                    <div class="prize-history-item">
-                        <div style="display:flex; align-items:center; flex:1;">
-                            <div class="prize-history-icon">${p.icon}</div>
-                            <div class="prize-history-info">
-                                <div class="prize-history-name">${p.name}</div>
-                                <div class="prize-history-time">${p.time}</div>
-                            </div>
-                        </div>
-                        <div class="redeem-btn">兑奖</div>
-                    </div>
-                `;
+                html += `<div class="prize-history-item"><div style="display:flex;align-items:flex-start;flex:1;"><div class="prize-history-icon">${p.icon}</div><div class="prize-history-info"><div class="prize-history-name">${p.name}</div><div class="prize-history-time">${p.time}</div></div></div><div class="redeem-btn">Resgatar</div></div>`;
             }
             prizesListContainer.innerHTML = html;
         }
 
         prizesListContainer.addEventListener('click', (e) => {
             const btn = e.target.closest('.redeem-btn');
-            if (!btn) return;
-
-            if (btn.classList.contains('loading') || btn.classList.contains('redeemed')) return;
-
+            if (!btn || btn.classList.contains('loading') || btn.classList.contains('redeemed')) return;
             btn.classList.add('loading');
-            btn.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spinner" style="width:14px;height:14px;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
-            `;
-
-            setTimeout(() => {
-                btn.classList.remove('loading');
-                btn.classList.add('redeemed');
-                btn.innerHTML = '已兑奖';
-            }, 2000);
+            btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spinner" style="width:14px;height:14px;"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>`;
+            setTimeout(() => { btn.classList.remove('loading'); btn.classList.add('redeemed'); btn.innerHTML = 'Resgatado'; }, 2000);
         });
 
-        // 核心抽奖逻辑
+        /* ── Sorteio ── */
         startBtn.addEventListener('click', () => {
             if (isDrawing) return;
-
             startBtn.classList.add('clicked');
             setTimeout(() => startBtn.classList.remove('clicked'), 150);
 
-            // 检查积分
-            if (currentPoints < costPerDraw) {
-                noPointsPopup.classList.add('show');
-                return; 
+            if (freeDraw) {
+                // rodada extra — grátis
+                freeDraw = false;
+            } else {
+                if (currentPoints < costPerDraw) {
+                    noPointsPopup.classList.add('show');
+                    return;
+                }
+                currentPoints -= costPerDraw;
+                pointsDisplayNum.innerText = currentPoints;
+                pointsDisplayContainer.style.transform = 'scale(1.15)';
+                pointsDisplayNum.style.color = '#ff3b30';
+                setTimeout(() => { pointsDisplayContainer.style.transform = 'scale(1)'; pointsDisplayNum.style.color = '#ffda46'; }, 300);
             }
 
-            // 扣除积分与动效
-            currentPoints -= costPerDraw;
-            pointsDisplayNum.innerText = currentPoints;
-            pointsDisplayContainer.style.transform = "scale(1.15)";
-            pointsDisplayNum.style.color = "#ff3b30";
-            
-            setTimeout(() => {
-                pointsDisplayContainer.style.transform = "scale(1)";
-                pointsDisplayNum.style.color = "#ffda46"; 
-            }, 300);
-
             isDrawing = true;
-
             const randomTargetIndex = Math.floor(Math.random() * prizeSequence.length);
-            const currentPosition = currentStep === -1 ? 0 : (currentStep % prizeSequence.length);
+            const currentPosition   = currentStep === -1 ? 0 : (currentStep % prizeSequence.length);
             let extraSteps = randomTargetIndex - currentPosition;
             if (extraSteps <= 0) extraSteps += prizeSequence.length;
             totalSteps = (baseCircles * prizeSequence.length) + extraSteps;
-
-            speed = 50; 
+            speed = 50;
             roll();
         });
 
@@ -1045,7 +1397,6 @@
             if (currentStep >= 0) {
                 gridItems[prizeSequence[currentStep % prizeSequence.length]].classList.remove('active');
             }
-
             currentStep++;
             totalSteps--;
 
@@ -1053,96 +1404,70 @@
             const currentItem = gridItems[currentItemIndex];
             currentItem.classList.add('active');
 
-            // 移动端短促震动反馈 (10毫秒)
             if (navigator.vibrate) navigator.vibrate(10);
 
-            if (totalSteps < 10) {
-                speed += 20; 
-            } else if (totalSteps < 20) {
-                speed += 10;
-            }
+            if (totalSteps < 10) { speed += 20; }
+            else if (totalSteps < 20) { speed += 10; }
 
             if (totalSteps <= 0) {
                 clearTimeout(timer);
-                
-                const prizeName = currentItem.lastElementChild.innerText;
+                const prizeName    = currentItem.lastElementChild.innerText;
                 const prizeSVGHTML = currentItem.querySelector('.icon').innerHTML;
-                
                 currentItem.classList.add('winner');
-                
+
                 setTimeout(() => {
                     currentItem.classList.remove('winner');
-                    
-                    // 记录中奖历史
-                    if (!prizeName.includes('谢谢参与') && !prizeName.includes('再来一次')) {
-                        const now = new Date();
-                        const timeString = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-                        
-                        prizeHistory.push({
-                            name: prizeName,
-                            icon: prizeSVGHTML,
-                            time: timeString
-                        });
+
+                    /* ── Rodada extra：立即给一次免费抽奖 ── */
+                    if (prizeName.includes('Rodada extra')) {
+                        showToast('Rodada extra! Preparando +1 jogada grátis...');
+                        triggerConfetti();
+                        if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+                        freeDraw = true;
+                        isDrawing = false;
+                        setTimeout(() => startBtn.click(), 2800);
+                        return;
                     }
 
-                    // 积分加分动效
-                    let wonPoints = 0;
-                    if (prizeName.includes('500购物积分')) {
-                        wonPoints = 500;
-                    } else if (prizeName.includes('888购物积分')) {
-                        wonPoints = 888;
+                    /* ── 普通奖品记录 ── */
+                    if (!prizeName.includes('Obrigado!')) {
+                        const now = new Date();
+                        const timeString = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                        prizeHistory.push({ name: prizeName, icon: prizeSVGHTML, time: timeString });
                     }
+
+                    /* ── 积分奖品加分 ── */
+                    let wonPoints = 0;
+                    if (prizeName.includes('500 pts')) wonPoints = 500;
+                    else if (prizeName.includes('888 pts')) wonPoints = 888;
 
                     if (wonPoints > 0) {
                         currentPoints += wonPoints;
                         pointsDisplayNum.innerText = currentPoints;
-                        
-                        pointsDisplayContainer.style.transform = "scale(1.15)";
-                        pointsDisplayNum.style.color = "#4CAF50"; 
-                        
-                        setTimeout(() => {
-                            pointsDisplayContainer.style.transform = "scale(1)";
-                            pointsDisplayNum.style.color = "#ffda46";
-                        }, 500);
+                        pointsDisplayContainer.style.transform = 'scale(1.15)';
+                        pointsDisplayNum.style.color = '#4CAF50';
+                        setTimeout(() => { pointsDisplayContainer.style.transform = 'scale(1)'; pointsDisplayNum.style.color = '#ffda46'; }, 500);
                     }
-                    
-                    // 弹出中奖框
+
+                    /* ── 弹窗 ── */
                     document.getElementById('popupIcon').innerHTML = prizeSVGHTML;
                     document.getElementById('popupPrizeName').innerText = prizeName;
                     popupOverlay.classList.add('show');
 
-                    if (!prizeName.includes('谢谢参与')) {
+                    if (!prizeName.includes('Obrigado!')) {
                         triggerConfetti();
                         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
                     }
-
                     isDrawing = false;
                 }, 1200);
-
             } else {
                 timer = setTimeout(roll, speed);
             }
         }
-
-        closePopupBtn.addEventListener('click', () => {
-            popupOverlay.classList.remove('show');
-            if(currentStep >= 0) {
-                gridItems[prizeSequence[currentStep % prizeSequence.length]].classList.remove('active');
-                currentStep = -1;
-            }
-        });
-
-        getMorePointsBtn.addEventListener('click', () => {
-            window.location.href = "https://www.example.com/get-more-points"; 
-        });
-
-        closeNoPointsBtn.addEventListener('click', () => {
-            noPointsPopup.classList.remove('show');
-        });
     });
 </script>
 
-<!-- ================= 动态背景逻辑 ================= -->
+<!-- Fundo dinâmico (p5) -->
 <script>
     let particles = [];
     function setup() {
