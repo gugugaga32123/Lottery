@@ -21,7 +21,6 @@
 
         body {
             background: linear-gradient(180deg, #ff8c1c 0%, #ff5200 100%);
-            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -60,9 +59,10 @@
             0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.85; }
             50%       { transform: translateY(-10px) rotate(8deg); opacity: 1; }
         }
+        /* transform/filter 合成层动画，避免每帧重算 box-shadow */
         @keyframes badge-glow {
-            0%, 100% { box-shadow: 0 0 12px rgba(255, 200, 50, 0.6), 0 4px 20px rgba(180, 80, 0, 0.5), inset 0 1px 2px rgba(255,255,255,0.8); }
-            50%       { box-shadow: 0 0 24px rgba(255, 210, 80, 0.9), 0 6px 28px rgba(180, 80, 0, 0.6), inset 0 1px 2px rgba(255,255,255,0.8); }
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50%       { transform: scale(1.02); filter: brightness(1.07); }
         }
         @keyframes title-appear {
             0%   { opacity: 0; transform: translateY(18px) scale(0.95); }
@@ -106,7 +106,6 @@
             position: absolute;
             font-size: 22px;
             animation: float-coin 3s ease-in-out infinite;
-            filter: drop-shadow(0 2px 4px rgba(180, 80, 0, 0.4));
         }
         .header-coin:nth-child(1) { top: 10px; left: 8%;  animation-delay: 0s;    font-size: 20px; }
         .header-coin:nth-child(2) { top: 25px; right: 10%; animation-delay: 0.7s; font-size: 26px; }
@@ -131,6 +130,8 @@
             max-width: calc(100% - 24px);
             text-align: center;
             line-height: 1.25;
+            transform-origin: center;
+            box-shadow: 0 0 18px rgba(255, 205, 60, 0.75), 0 5px 22px rgba(180, 80, 0, 0.52), inset 0 1px 2px rgba(255,255,255,0.8);
             animation: badge-glow 2.5s ease-in-out infinite;
             border: 1px solid rgba(255, 200, 80, 0.9);
         }
@@ -242,9 +243,7 @@
             justify-content: center;
             gap: 4px;
             max-width: 100%;
-            background: rgba(0, 0, 0, 0.22);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.32);
             color: rgba(255, 245, 220, 0.9);
             padding: 6px 18px;
             border-radius: 30px;
@@ -253,7 +252,7 @@
             margin-bottom: 10px;
             border: 1px solid rgba(255, 210, 100, 0.35);
             letter-spacing: 0.5px;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             transform-origin: center;
         }
         .points-display .points-icon {
@@ -350,7 +349,7 @@
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(0, 0, 0, 0.04);
-            transition: all 0.15s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
             text-align: center;
             line-height: 1.18;
             padding: 2px 3px;
@@ -367,12 +366,14 @@
         }
 
         @keyframes winnerBlink {
-            0%, 100% { box-shadow: 0 0 0 3px #ff3b30, 0 4px 12px rgba(255, 59, 48, 0.6); transform: scale(0.95); }
-            50% { box-shadow: 0 0 0 5px #ffda46, 0 6px 20px rgba(255, 218, 70, 0.8); transform: scale(1.08); background: #fffdf5; }
+            0%, 100% { transform: scale(0.95); }
+            50% { transform: scale(1.06); }
         }
         .grid-item.winner {
             animation: winnerBlink 0.4s ease-in-out 3;
             z-index: 5;
+            box-shadow: 0 0 0 4px #ffda46, 0 6px 18px rgba(255, 59, 48, 0.45);
+            background: linear-gradient(180deg, #fffdf8 0%, #ffe8e4 100%);
         }
 
         /* Ícones SVG */
@@ -469,7 +470,7 @@
             align-items: center;
             justify-content: center;
             border: 2px solid #ffe3df;
-            transition: all 0.2s;
+            transition: transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease;
             white-space: normal;
             text-align: center;
             line-height: 1.25;
@@ -595,6 +596,7 @@
             height: 138px;
             overflow: hidden;
             position: relative;
+            contain: layout paint;
         }
 
         .announcement-list {
@@ -634,8 +636,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.68);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -660,7 +661,7 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.8);
             transform: scale(0.6) translateY(50px);
             opacity: 0;
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             overflow: hidden;
             display: flex;
@@ -839,7 +840,7 @@
             border-radius: 15px;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(255, 82, 0, 0.3);
-            transition: all 0.2s;
+            transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -949,6 +950,20 @@
             font-size: 10.5px;
             margin-left: 3px;
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            .announcement-list { animation: none !important; transform: translateY(0) !important; }
+            .header-coin,
+            .vip-badge,
+            .subtitle-diamond,
+            .main-title::after,
+            .popup-light,
+            .popup-icon,
+            .deadline-strip .deadline-dot,
+            .spinner {
+                animation: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -962,7 +977,6 @@
                 <svg viewBox="0 0 32 32" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="16" cy="16" r="14" fill="url(#coin-grad1)" stroke="#c97a00" stroke-width="1.5"/>
                     <circle cx="16" cy="16" r="10" fill="none" stroke="rgba(255,220,80,0.5)" stroke-width="1"/>
-                    <text x="16" y="20.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#7a3800" font-family="'Source Sans 3',sans-serif">R$</text>
                     <defs><radialGradient id="coin-grad1" cx="38%" cy="32%" r="65%"><stop offset="0%" stop-color="#fff5c0"/><stop offset="50%" stop-color="#ffc820"/><stop offset="100%" stop-color="#e07800"/></radialGradient></defs>
                 </svg>
             </span>
@@ -970,7 +984,6 @@
                 <svg viewBox="0 0 32 32" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="16" cy="16" r="14" fill="url(#coin-grad2)" stroke="#c97a00" stroke-width="1.5"/>
                     <circle cx="16" cy="16" r="10" fill="none" stroke="rgba(255,220,80,0.5)" stroke-width="1"/>
-                    <text x="16" y="20.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#7a3800" font-family="'Source Sans 3',sans-serif">R$</text>
                     <defs><radialGradient id="coin-grad2" cx="38%" cy="32%" r="65%"><stop offset="0%" stop-color="#fff5c0"/><stop offset="50%" stop-color="#ffc820"/><stop offset="100%" stop-color="#e07800"/></radialGradient></defs>
                 </svg>
             </span>
@@ -984,7 +997,6 @@
                 <svg viewBox="0 0 32 32" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="16" cy="16" r="14" fill="url(#coin-grad3)" stroke="#c97a00" stroke-width="1.5"/>
                     <circle cx="16" cy="16" r="10" fill="none" stroke="rgba(255,220,80,0.5)" stroke-width="1"/>
-                    <text x="16" y="20.5" text-anchor="middle" font-size="8.5" font-weight="900" fill="#7a3800" font-family="'Source Sans 3',sans-serif">R$</text>
                     <defs><radialGradient id="coin-grad3" cx="38%" cy="32%" r="65%"><stop offset="0%" stop-color="#fff5c0"/><stop offset="50%" stop-color="#ffc820"/><stop offset="100%" stop-color="#e07800"/></radialGradient></defs>
                 </svg>
             </span>
@@ -1038,7 +1050,7 @@
     </div>
 
     <div class="lottery-machine">
-        <img src="machine-bg_2.png" alt="Máquina de sorteio" class="machine-bg-img">
+        <img src="machine-bg_2.png" alt="Máquina de sorteio" class="machine-bg-img" width="550" height="728" decoding="async" fetchpriority="high">
         
         <div class="machine-content" aria-label="Grade de sorteio">
             <div class="lottery-grid">
@@ -1046,7 +1058,7 @@
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff473a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V6z"></path><path d="M9 10h.01M15 10h.01M9 14h.01M15 14h.01"></path></svg>
                     </div>
-                    <div>Cupom R$50</div>
+                    <div>Cupom 50</div>
                 </div>
                 <div class="grid-item yellow-bg">
                     <div class="tag">TOP</div>
@@ -1065,7 +1077,7 @@
                     <div class="icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff473a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V6z"></path><path d="M9 10h.01M15 10h.01M9 14h.01M15 14h.01"></path></svg>
                     </div>
-                    <div>Cupom R$100</div>
+                    <div>Cupom 100</div>
                 </div>
                 
                 <div class="grid-item center-btn" id="startBtn">
@@ -1199,16 +1211,32 @@
     </div>
 </div>
 
+<div class="popup-overlay" id="networkPopup" style="z-index: 100000;">
+    <div class="popup-content" style="background: #fff; padding: 40px 20px; max-width: 260px; border-radius: 16px;">
+        <div class="popup-inner" id="networkPopupInner">
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
 
         /* ── Confetti ── */
         function triggerConfetti() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                confetti({ particleCount: 24, spread: 70, origin: { y: 0.6 }, zIndex: 10000, colors: ['#ff8c1c','#ff5200','#ffda46','#4CAF50'] });
+                return;
+            }
             const duration = 2500;
             const end = Date.now() + duration;
+            let tick = 0;
             (function frame() {
-                confetti({ particleCount: 5, angle: 60,  spread: 55, origin: { x: 0 }, zIndex: 10000, colors: ['#ff8c1c','#ff5200','#ffda46','#4CAF50'] });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, zIndex: 10000, colors: ['#ff8c1c','#ff5200','#ffda46','#4CAF50'] });
+                tick++;
+                /* 隔帧喷发，减轻主线程与 confetti canvas 压力 */
+                if (tick % 2 === 0) {
+                    confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 }, zIndex: 10000, colors: ['#ff8c1c','#ff5200','#ffda46','#4CAF50'] });
+                    confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 }, zIndex: 10000, colors: ['#ff8c1c','#ff5200','#ffda46','#4CAF50'] });
+                }
                 if (Date.now() < end) requestAnimationFrame(frame);
             }());
         }
@@ -1245,17 +1273,17 @@
 
         /* ── Announcement data (巴西手机格式 + 时间戳) ── */
         const announcements = [
-            { phone: '(11) 9****-4823', prize: 'Cupom R$100',      time: '00:14' },
+            { phone: '(11) 9****-4823', prize: 'Cupom 100',      time: '00:14' },
             { phone: '(21) 9****-7391', prize: '500 pts na loja',  time: '00:27' },
             { phone: '(31) 9****-2047', prize: 'Cupom 10% OFF',    time: '00:43' },
             { phone: '(41) 9****-8165', prize: 'Frete grátis',     time: '00:58' },
-            { phone: '(51) 9****-3782', prize: 'Cupom R$50',       time: '01:09' },
+            { phone: '(51) 9****-3782', prize: 'Cupom 50',       time: '01:09' },
             { phone: '(61) 9****-9043', prize: '888 pts na loja',  time: '01:22' },
-            { phone: '(71) 9****-5216', prize: 'Cupom R$100',      time: '01:35' },
+            { phone: '(71) 9****-5216', prize: 'Cupom 100',      time: '01:35' },
             { phone: '(81) 9****-6894', prize: 'Frete grátis',     time: '01:47' },
             { phone: '(85) 9****-1237', prize: 'Cupom 10% OFF',    time: '01:59' },
             { phone: '(27) 9****-4519', prize: '500 pts na loja',  time: '02:13' },
-            { phone: '(11) 9****-8731', prize: 'Cupom R$50',       time: '02:28' },
+            { phone: '(11) 9****-8731', prize: 'Cupom 50',       time: '02:28' },
             { phone: '(21) 9****-2485', prize: '888 pts na loja',  time: '02:41' },
         ];
         const speakerSVG = `<svg viewBox="0 0 24 24" fill="#ff473a" style="width:15px;height:15px;margin-right:6px;flex-shrink:0;margin-top:2px;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>`;
@@ -1323,20 +1351,30 @@
         closeNoPointsBtn.addEventListener('click', () => noPointsPopup.classList.remove('show'));
         closeMyPrizesBtn.addEventListener('click', () => myPrizesPopup.classList.remove('show'));
 
-        /* ── 积分按钮 ── */
-        getMainPointsBtn.addEventListener('click', () => {
-            if (getMainPointsBtn.classList.contains('loading')) return;
-            getMainPointsBtn.classList.add('loading');
-            getMainPointsBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spinner"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg> Carregando...`;
-            setTimeout(() => {
-                getMainPointsBtn.classList.remove('loading');
-                getMainPointsBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Ganhar pontos`;
-            }, 2000);
-        });
+        /* ── 新增：网络加载/失败模拟逻辑 ── */
+        function showNetworkError() {
+            const networkPopup = document.getElementById('networkPopup');
+            const networkPopupInner = document.getElementById('networkPopupInner');
 
-        getMorePointsBtn.addEventListener('click', () => {
-            window.location.href = "https://www.example.com/get-more-points";
-        });
+            networkPopup.classList.add('show');
+            networkPopupInner.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ff8c1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spinner" style="width:40px;height:40px;margin:0 auto 15px;display:block;"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+                <div style="font-size:16px; color:#666; font-weight:bold; text-align:center;">Carregando...</div>
+            `;
+
+            setTimeout(() => {
+                networkPopupInner.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#ff473a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:45px;height:45px;margin:0 auto 15px;display:block;"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                    <div style="font-size:16px; color:#d71607; font-weight:bold; text-align:center;">Falha na conexão</div>
+                `;
+                setTimeout(() => {
+                    networkPopup.classList.remove('show');
+                }, 1500);
+            }, 1500);
+        }
+
+        getMainPointsBtn.addEventListener('click', showNetworkError);
+        getMorePointsBtn.addEventListener('click', showNetworkError);
 
         /* ── Meus Prêmios ── */
         openMyPrizesBtn.addEventListener('click', () => { renderPrizeHistory(); myPrizesPopup.classList.add('show'); });
@@ -1356,10 +1394,8 @@
 
         prizesListContainer.addEventListener('click', (e) => {
             const btn = e.target.closest('.redeem-btn');
-            if (!btn || btn.classList.contains('loading') || btn.classList.contains('redeemed')) return;
-            btn.classList.add('loading');
-            btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spinner" style="width:14px;height:14px;"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>`;
-            setTimeout(() => { btn.classList.remove('loading'); btn.classList.add('redeemed'); btn.innerHTML = 'Resgatado'; }, 2000);
+            if (!btn) return;
+            showNetworkError();
         });
 
         /* ── Sorteio ── */
@@ -1470,14 +1506,28 @@
 <!-- Fundo dinâmico (p5) -->
 <script>
     let particles = [];
+    const motionReduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     function setup() {
         let canvas = createCanvas(windowWidth, windowHeight);
         canvas.position(0, 0);
         canvas.style('z-index', '0');
         canvas.style('pointer-events', 'none');
         canvas.style('position', 'fixed');
-        frameRate(30);
-        for (let i = 0; i < 40; i++) particles.push(new Particle());
+        const lowMotion = motionReduce();
+        frameRate(lowMotion ? 12 : 20);
+        const n = lowMotion ? 12 : 28;
+        for (let i = 0; i < n; i++) particles.push(new Particle());
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                noLoop();
+            } else {
+                frameRate(motionReduce() ? 12 : 20);
+                loop();
+            }
+        });
+        if (document.hidden) noLoop();
     }
     function draw() {
         clear();
